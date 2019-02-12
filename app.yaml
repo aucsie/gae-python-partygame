@@ -1,4 +1,4 @@
-application: my-porject-id
+application: my-project-id
 version: 1
 runtime: python27
 api_version: 1
@@ -13,3 +13,5 @@ handlers:
 - url: /runcode/.*
   script: runcode.app
   login: required
+- url: /passgate/.*
+  script: passgate.app
