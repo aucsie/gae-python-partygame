@@ -1,6 +1,7 @@
 import webapp2
 from google.appengine.ext import ndb
 from google.appengine.api import users
+import json
 
 admin = 'au4451@au.edu.tw'
 
@@ -184,16 +185,18 @@ class ShowStatus(webapp2.RequestHandler):
                 team = passscore.team
                 score = int(passscore.score)
                 status[team] = score
-                result['level'] = mlevel
-                result['status'] = status
+            result['level'] = mlevel
+            result['status'] = status
+            result = json.dumps(result, ensure_ascii=False)
         elif mteam  and mlevel == '':
             passscores = PassScore.query(PassScore.team==mteam)
             for passscore in passscores:
                 level = passscore.level
                 score = int(passscore.score)
                 status[level] = score
-                result['team'] = mteam
-                result['status'] = status
+            result['team'] = mteam
+            result['status'] = status
+            result = json.dumps(result, ensure_ascii=False)
         elif mteam == '' and mlevel == '':
             passscores = PassScore.query()
             for passscore in passscores:
@@ -204,7 +207,8 @@ class ShowStatus(webapp2.RequestHandler):
                     status[team] = status[team] + score
                 else:
                     status[team] = score
-                result = status
+            result = status
+            result = json.dumps(result, ensure_ascii=False)
         else:
             self.response.headers['Content-Type'] = 'text/html'
             self.response.write('FAIL'+mlevel+mteam)
@@ -219,10 +223,10 @@ class ShowStatus(webapp2.RequestHandler):
 class ClearGame(webapp2.RequestHandler):
     def post(self):
         user = users.get_current_user()
-        if user == None:
-            self.response.headers['Content-Type'] = 'text/html'
-            self.response.write('You need to login to clear game. {}'.format(createLogoutUrl()))
-            return None
+        #if user == None:
+        #    self.response.headers['Content-Type'] = 'text/html'
+        #    self.response.write('You need to login to clear game. {}'.format(createLogoutUrl()))
+        #    return None
         if user.email() != admin:
             nickname = user.nickname()
             self.response.headers['Content-Type'] = 'text/html'
