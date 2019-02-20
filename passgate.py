@@ -2,8 +2,7 @@ import webapp2
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
-# Google account for admin
-admin = 'xxx@xx.xx.xx'
+admin = 'au4451@au.edu.tw'
 
 MAIN_PAGE_HTML = """\
 <html>
@@ -25,7 +24,7 @@ MAIN_PAGE_HTML = """\
         </tr>
         <tr>
             <td>/passgate/login?level=hell&pwd=guard</td>
-            <td>Login gate..</td>
+            <td>Login gate.</td>
         </tr>
         <tr>
             <td>/passgate/submit?team=hero&level=hell&score=10</td>
@@ -33,10 +32,14 @@ MAIN_PAGE_HTML = """\
         </tr>
         <tr>
             <td>/passgate/delete?level=hell</td>
-            <td>Delete a gate.</td>
+            <td>Delete gate.</td>
         </tr>
         <tr>
-            <td>/passgate/show</td>
+            <td>
+            /passgate/show<br>
+            /passgate/show?team=[name]<br>
+            /passgate/show?level=[name]<br>
+            </td>
             <td>Show the status.</td>
         </tr>
         <tr>
@@ -172,6 +175,7 @@ class ShowStatus(webapp2.RequestHandler):
         mteam = self.request.get("team")
 
         status = dict()
+        result = dict()
         
         if mlevel and mteam == '':
             passscores = PassScore.query(PassScore.level==mlevel)
@@ -180,12 +184,16 @@ class ShowStatus(webapp2.RequestHandler):
                 team = passscore.team
                 score = int(passscore.score)
                 status[team] = score
+                result['level'] = mlevel
+                result['status'] = status
         elif mteam  and mlevel == '':
             passscores = PassScore.query(PassScore.team==mteam)
             for passscore in passscores:
                 level = passscore.level
                 score = int(passscore.score)
                 status[level] = score
+                result['team'] = mteam
+                result['status'] = status
         elif mteam == '' and mlevel == '':
             passscores = PassScore.query()
             for passscore in passscores:
@@ -196,13 +204,14 @@ class ShowStatus(webapp2.RequestHandler):
                     status[team] = status[team] + score
                 else:
                     status[team] = score
+                result = status
         else:
             self.response.headers['Content-Type'] = 'text/html'
             self.response.write('FAIL'+mlevel+mteam)
             return None
 
         self.response.headers['Content-Type'] = 'text/html'
-        self.response.write(status)
+        self.response.write(result)
         return None
 
     get = post
